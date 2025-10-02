@@ -49,6 +49,13 @@ When creating this spec from a user prompt:
    - Error handling behaviors
    - Integration requirements
    - Security/compliance needs
+   - **Web Application Specific**:
+     - Responsive design requirements across devices
+     - Offline functionality needs
+     - Browser compatibility requirements
+     - Accessibility requirements (WCAG level)
+     - Performance thresholds (load times, Core Web Vitals)
+     - PWA features needed (offline, notifications, installation)
 
 ---
 
