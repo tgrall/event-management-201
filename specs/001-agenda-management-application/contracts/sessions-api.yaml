@@ -1,0 +1,270 @@
+openapi: 3.0.3
+info:
+  title: Sessions API
+  description: API endpoints for session management
+  version: 1.0.0
+
+paths:
+  /sessions:
+    get:
+      summary: Get all sessions with optional filtering
+      operationId: getAllSessions
+      parameters:
+        - name: eventId
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: trackId
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: tagIds
+          in: query
+          schema:
+            type: array
+            items:
+              type: string
+              format: uuid
+        - name: date
+          in: query
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: List of sessions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Session'
+
+    post:
+      summary: Create a new session
+      operationId: createSession
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateSessionRequest'
+      responses:
+        '201':
+          description: Session created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Session'
+        '400':
+          description: Invalid input data
+
+  /sessions/{sessionId}:
+    get:
+      summary: Get session by ID
+      operationId: getSessionById
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Session details with speakers
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionWithDetails'
+        '404':
+          description: Session not found
+
+    put:
+      summary: Update session
+      operationId: updateSession
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateSessionRequest'
+      responses:
+        '200':
+          description: Session updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Session'
+        '400':
+          description: Invalid input data
+        '404':
+          description: Session not found
+
+    delete:
+      summary: Delete session
+      operationId: deleteSession
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Session deleted successfully
+        '404':
+          description: Session not found
+
+components:
+  schemas:
+    Session:
+      type: object
+      required:
+        - id
+        - title
+        - description
+        - date
+        - eventId
+        - timeSlotId
+        - trackId
+        - speakerIds
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        title:
+          type: string
+          maxLength: 200
+          example: "Building Responsive Web Apps"
+        description:
+          type: string
+          example: "Learn modern techniques for creating responsive web applications"
+        date:
+          type: string
+          format: date
+        eventId:
+          type: string
+          format: uuid
+        timeSlotId:
+          type: string
+          format: uuid
+        trackId:
+          type: string
+          format: uuid
+        speakerIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+          minItems: 1
+        tagIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    SessionWithDetails:
+      allOf:
+        - $ref: '#/components/schemas/Session'
+        - type: object
+          properties:
+            speakers:
+              type: array
+              items:
+                $ref: './speakers-api.yaml#/components/schemas/Speaker'
+            track:
+              $ref: './tracks-api.yaml#/components/schemas/Track'
+            tags:
+              type: array
+              items:
+                $ref: './tags-api.yaml#/components/schemas/Tag'
+            timeSlot:
+              $ref: './events-api.yaml#/components/schemas/TimeSlot'
+
+    CreateSessionRequest:
+      type: object
+      required:
+        - title
+        - description
+        - date
+        - eventId
+        - timeSlotId
+        - trackId
+        - speakerIds
+      properties:
+        title:
+          type: string
+          maxLength: 200
+        description:
+          type: string
+        date:
+          type: string
+          format: date
+        eventId:
+          type: string
+          format: uuid
+        timeSlotId:
+          type: string
+          format: uuid
+        trackId:
+          type: string
+          format: uuid
+        speakerIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+          minItems: 1
+        tagIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+
+    UpdateSessionRequest:
+      type: object
+      properties:
+        title:
+          type: string
+          maxLength: 200
+        description:
+          type: string
+        date:
+          type: string
+          format: date
+        timeSlotId:
+          type: string
+          format: uuid
+        trackId:
+          type: string
+          format: uuid
+        speakerIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+          minItems: 1
+        tagIds:
+          type: array
+          items:
+            type: string
+            format: uuid

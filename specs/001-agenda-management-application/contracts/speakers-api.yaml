@@ -1,0 +1,207 @@
+openapi: 3.0.3
+info:
+  title: Speakers API
+  description: API endpoints for speaker management
+  version: 1.0.0
+
+paths:
+  /speakers:
+    get:
+      summary: Get all speakers
+      operationId: getAllSpeakers
+      responses:
+        '200':
+          description: List of speakers
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Speaker'
+
+    post:
+      summary: Create a new speaker
+      operationId: createSpeaker
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateSpeakerRequest'
+      responses:
+        '201':
+          description: Speaker created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Speaker'
+        '400':
+          description: Invalid input data
+
+  /speakers/{speakerId}:
+    get:
+      summary: Get speaker by ID
+      operationId: getSpeakerById
+      parameters:
+        - name: speakerId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Speaker details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Speaker'
+        '404':
+          description: Speaker not found
+
+    put:
+      summary: Update speaker
+      operationId: updateSpeaker
+      parameters:
+        - name: speakerId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateSpeakerRequest'
+      responses:
+        '200':
+          description: Speaker updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Speaker'
+        '400':
+          description: Invalid input data
+        '404':
+          description: Speaker not found
+
+    delete:
+      summary: Delete speaker
+      operationId: deleteSpeaker
+      parameters:
+        - name: speakerId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Speaker deleted successfully
+        '404':
+          description: Speaker not found
+        '409':
+          description: Speaker has associated sessions
+
+components:
+  schemas:
+    Speaker:
+      type: object
+      required:
+        - id
+        - name
+        - jobTitle
+        - company
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          maxLength: 100
+          example: "Jane Smith"
+        jobTitle:
+          type: string
+          maxLength: 100
+          example: "Senior Frontend Developer"
+        company:
+          type: string
+          maxLength: 100
+          example: "TechCorp Inc."
+        bio:
+          type: string
+          example: "Jane is a passionate frontend developer with 8 years of experience..."
+        profileImageUrl:
+          type: string
+          format: uri
+          example: "https://example.com/images/jane-smith.jpg"
+        socialLinks:
+          $ref: '#/components/schemas/SocialLinks'
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    SocialLinks:
+      type: object
+      properties:
+        twitter:
+          type: string
+          example: "@janesmith"
+        linkedin:
+          type: string
+          format: uri
+          example: "https://linkedin.com/in/janesmith"
+        github:
+          type: string
+          example: "janesmith"
+
+    CreateSpeakerRequest:
+      type: object
+      required:
+        - name
+        - jobTitle
+        - company
+      properties:
+        name:
+          type: string
+          maxLength: 100
+        jobTitle:
+          type: string
+          maxLength: 100
+        company:
+          type: string
+          maxLength: 100
+        bio:
+          type: string
+        profileImageUrl:
+          type: string
+          format: uri
+        socialLinks:
+          $ref: '#/components/schemas/SocialLinks'
+
+    UpdateSpeakerRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 100
+        jobTitle:
+          type: string
+          maxLength: 100
+        company:
+          type: string
+          maxLength: 100
+        bio:
+          type: string
+        profileImageUrl:
+          type: string
+          format: uri
+        socialLinks:
+          $ref: '#/components/schemas/SocialLinks'
